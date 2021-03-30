@@ -71,5 +71,5 @@ int main()
 	int n = sizeof(keys) / sizeof(keys[0]);
 	cout << "Cost of Optimal BST is "
 		<< optimalSearchTree(keys, freq, n);
-	ret
+	return 0;
 }
