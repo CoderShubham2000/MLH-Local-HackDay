@@ -1,0 +1,172 @@
+#Setting Up the Repository
+
+$ sudo apt-get update
+$ sudo apt-get install \
+apt-transport-https \
+ca-certificates \
+curl \
+gnupg-agent \
+software-properties-common
+
+#Adding Docker's official GPG Key
+
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add –
+
+#We will Verify that now we have the key with the fingerprint 9DC8 5822 9FC7 DD38 854A
+E2D8 8D81 803C 0EBF CD88, by searching for the last 8 characters of the fingerprint.
+
+#Result
+
+$ sudo apt-key fingerprint 0EBFCD88
+pub rsa4096 2017-02-22 [SCEA]
+9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
+uid [ unknown] Docker Release (CE deb) <docker@docker.com>
+sub rsa4096 2017-02-22 [S]
+
+#Setting up the stable repository
+
+$ sudo add-apt-repository \
+"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) \
+stable"
+
+#Installing the Docker Engine
+
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io
+$ apt-cache madison docker-ce
+docker-ce | 5:18.09.1~3-0~ubuntu-xenial | https://download.docker.com/linux/ubuntu
+xenial/stable amd64 Packages
+docker-ce | 5:18.09.0~3-0~ubuntu-xenial | https://download.docker.com/linux/ubuntu
+xenial/stable amd64 Packages
+docker-ce | 18.06.1~ce~3-0~ubuntu | https://download.docker.com/linux/ubuntu
+xenial/stable amd64 Packages
+docker-ce | 18.06.0~ce~3-0~ubuntu | https://download.docker.com/linux/ubuntu
+xenial/stable amd64 Packages
+...
+$ sudo apt-get install docker-ce=<VERSION_STRING>
+docker-ce-cli=<VERSION_STRING> containerd.io
+
+#Verification that its installed:
+$ sudo docker run hello-world
+
+#Creating my own docker Image:
+Creating a new folder called ‘my-first-docker-image’
+
+#Command: 
+mkdir my-first-docker-image
+
+#Creating a file named Dockerfile with no extensions
+Command: touch Dockerfile
+
+#Opening this file, and entering the following 2 lines of text:
+FROM python:2
+CMD [ "python","-c", "print '\\n'.join(\"%i Byte = %i Bit = largest number: %i\" % (j, j*8,
+256**j-1) for j in (1 << i for i in xrange(8)))" ]
+
+#Saving and closing the file and executing the following Command:
+docker build -t python-test
+
+#Images Downloaded for running it we enter the following command
+docker run -it --rm python-test
+
+#Testing using smart contracts
+
+#Step 0: NPM init
+
+#Step 1: Creating the UI using Vue
+npm install -g @vue/cli
+# or
+yarn global add @vue/cli
+vue create u
+
+#Step 2: Creating some smart contracts
+npm install -g truffle
+mkdir smart-contracts
+cd smart-contracts
+truffle unbox metacoin
+
+#Install and run Ganache-CLI
+
+npm install -g ganache-cli
+ganache-cli
+
+#Once it runs, we can "Migrate the smart contracts" and start the UI
+
+#Step 4: Putting it all together in a single docker-compose file
+
+version: '3'
+services:
+# gateway/reverse proxy
+nginx:
+build: ./services/nginx
+restart: always
+depends_on:
+- api
+- ui
+- ganache
+volumes:
+- ./logs:/var/log/nginx
+ports:
+# proxy api + ui
+- "80:9000"
+# proxy ethereum node so you can connect with metamask from browser
+- "8545:9001"
+# starts webpack watch server with hot reload for ui (vue) code
+ui:
+build:
+context: ./services/ui
+dockerfile: Dockerfile.development
+restart: always
+env_file:
+- ./services/ui/.env
+volumes:
+- ./services/ui/src:/app/ui/src/
+- ./logs:/logs
+# api, handles browser requests initiated from ui api:
+api:
+build:
+context: ./services/api
+dockerfile: Dockerfile.development
+restart: always
+env_file:
+- ./services/api/.env
+depends_on:
+- mongo
+volumes:
+- ./services/api/src:/app/api/src/
+- ./logs:/logs
+# smart contracts source, tests and deployment code
+smart-contracts:
+build:
+context: ./services/smart-contracts
+dockerfile: Dockerfile.development
+env_file:
+- ./services/smart-contracts/.env
+depends_on:
+- ganache
+volumes:
+# mount the output contract build files into a host folder
+- ./services/smart-contracts/src/build:/app/smart-contracts/build/
+# mount the output test coverage report folder into a host folder
+- ./services/smart-contracts/coverage-report:/app/smart-contracts/coverage/
+- ./logs:/logs
+# ganache-cli ethereum node
+ganache:
+image: trufflesuite/ganache-cli
+command: "--seed abcd --defaultBalanceEther 100000000"
+# mongodb
+mongo:
+build: ./services/mongodb
+restart: always
+ports:
+# allow acces from (only!) localhost to mongo port 27017 so you can use
+# MongoHub or some other app to connect to the mongodb and view its
+contents
+- "127.0.0.1:27017:27017"
+volumes:
+- ./data/mongo:/data/db
+- ./logs:/var/log/mongodb
+ 
+#Building and starting this image is done by the following command:
+Docker-compose up
