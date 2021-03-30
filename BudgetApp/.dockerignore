@@ -1,0 +1,13 @@
+# Ignore all
+*
+
+# Except dirs
+!/cmd/*
+!/internal/*
+!/static/*
+!/templates/*
+!/vendor/*
+
+# Except files
+!go.mod
+!go.sum

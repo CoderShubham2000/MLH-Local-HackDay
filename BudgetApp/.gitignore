@@ -1,0 +1,9 @@
+# Dirs
+.idea/
+.vscode/
+bin/
+var/
+
+# Files
+/_*
+/*.out
