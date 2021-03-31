@@ -1,10 +1,3 @@
-# ![Rails Example App](project-logo.png)
-
-> Example Rails codebase that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) API spec.
-
-This repo is functionality complete -- PRs and issues welcome!
-
-Check out the [rails-5.1 branch](https://github.com/gothinkster/rails-realworld-example-app/tree/rails-5.1) to see the updated code for Rails 5.1
 
 # Getting started
 
