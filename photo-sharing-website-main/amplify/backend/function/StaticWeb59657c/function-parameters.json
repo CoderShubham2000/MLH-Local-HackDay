@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "api": {
+      "photosharing": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    },
+    "storage": {
+      "s3871f7e84": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    },
+    "hosting": {
+      "S3AndCloudFront": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

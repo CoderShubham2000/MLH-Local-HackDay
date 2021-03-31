@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create Admin user'
+Parameters:
+  emailaddress:
+    Type: String
+  authphotosharing84970f75UserPoolId:
+    Type: String
+  env:
+    Type: String    
+Resources:
+  CognitoUserPoolAdmin:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      Username: !Ref emailaddress
+      DesiredDeliveryMediums:
+        - EMAIL
+      UserPoolId: !Ref authphotosharing84970f75UserPoolId
+      UserAttributes:
+        - Name: email
+          Value: !Ref emailaddress
